@@ -94,7 +94,7 @@ class Marquee extends StatefulWidget {
     super.key,
     required this.text,
     this.style,
-    this.textScaleFactor,
+    this.textScaler,
     this.textDirection = TextDirection.ltr,
     this.scrollAxis = Axis.horizontal,
     this.crossAxisAlignment = CrossAxisAlignment.center,
@@ -172,23 +172,23 @@ class Marquee extends StatefulWidget {
   /// * [text] to provide the text itself.
   final TextStyle? style;
 
-  /// The font scale of the text to be displayed.
+  /// The font scaler of the text to be displayed.
   ///
   /// ## Sample code
   ///
-  /// This marquee has a fixed text scale factor, indipendent to the user selected resolution:
+  /// This marquee has a fixed text scaler, independent to the user selected resolution:
   ///
   /// ```dart
   /// Marquee(
   ///   text: 'This is some bold text.',
-  ///   textScaleFactor: 1
+  ///   textScaler: TextScaler.linear(1.0)
   /// )
   /// ```
   ///
   /// See also:
   ///
   /// * [text] to provide the text itself.
-  final double? textScaleFactor;
+  final TextScaler? textScaler;
 
   /// The text direction of the text to be displayed.
   ///
@@ -532,9 +532,11 @@ class _MarqueeState extends State<Marquee> with SingleTickerProviderStateMixin {
   bool _running = false;
   bool _isOnPause = false;
   int _roundCounter = 0;
+
   bool get isDone => widget.numberOfRounds == null
       ? false
       : widget.numberOfRounds == _roundCounter;
+
   bool get showFading =>
       !widget.showFadingOnlyWhenScrolling ? true : !_isOnPause;
 
@@ -730,12 +732,18 @@ class _MarqueeState extends State<Marquee> with SingleTickerProviderStateMixin {
       physics: NeverScrollableScrollPhysics(),
       itemBuilder: (_, i) {
         final text = i.isEven
-            ? Text(widget.text,
-                style: widget.style, textScaleFactor: widget.textScaleFactor)
+            ? Text(
+                widget.text,
+                style: widget.style,
+                textScaler: widget.textScaler,
+              )
             : _buildBlankSpace();
-        return alignment == null
-            ? text
-            : Align(alignment: alignment, child: text);
+        return alignment != null
+            ? Align(
+                alignment: alignment,
+                child: text,
+              )
+            : text;
       },
     );
 
